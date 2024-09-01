@@ -28,4 +28,9 @@ The *McGill Degree Builder* is a tool **in development** to help students at McG
 
 ## Potential Problems
 - **Future Course Availability**: There is no way for us to see if a course will be scheduled for a semester in the future
-- **Majors have varying formats**: Take [Major Concentration Philosophy](https://www.mcgill.ca/study/2024-2025/faculties/arts/undergraduate/programs/bachelor-arts-ba-major-concentration-philosophy#ba_phl8_major_ar) & [Major Concentration Psychology](https://www.mcgill.ca/study/2024-2025/faculties/arts/undergraduate/programs/bachelor-arts-ba-major-concentration-psychology#ba_psy8_major_ar)
+- **Majors have varying formats**: Take [Major Concentration Philosophy](https://www.mcgill.ca/study/2024-2025/faculties/arts/undergraduate/programs/bachelor-arts-ba-major-concentration-philosophy#ba_phl8_major_ar) vs. [Major Concentration Psychology](https://www.mcgill.ca/study/2024-2025/faculties/arts/undergraduate/programs/bachelor-arts-ba-major-concentration-psychology#ba_psy8_major_ar)
+
+## Relevant Links
+- [All Arts Major Concentrations](https://www.mcgill.ca/study/2024-2025/faculties/arts/undergraduate/ug_arts_major_concentrations)
+- [All Arts Minor Concentrations](https://www.mcgill.ca/study/2024-2025/faculties/arts/undergraduate/ug_arts_minor_concentrations)
+- [Arts Honours Programs](https://www.mcgill.ca/study/2024-2025/faculties/arts/undergraduate/ug_arts_honours_programs)
