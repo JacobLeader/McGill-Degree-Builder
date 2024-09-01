@@ -28,3 +28,4 @@ The *McGill Degree Builder* is a tool **in development** to help students at McG
 
 ## Potential Problems
 - **Future Course Availability**: There is no way for us to see if a course will be scheduled for a semester in the future
+- **Majors have varying formats**: Take [Major Concentration Philosophy](https://www.mcgill.ca/study/2024-2025/faculties/arts/undergraduate/programs/bachelor-arts-ba-major-concentration-philosophy#ba_phl8_major_ar) & [Major Concentration Psychology](https://www.mcgill.ca/study/2024-2025/faculties/arts/undergraduate/programs/bachelor-arts-ba-major-concentration-psychology#ba_psy8_major_ar)
