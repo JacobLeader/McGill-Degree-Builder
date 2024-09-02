@@ -5,7 +5,7 @@ import json
 
 class CourseScraper():
     def main(self):
-        page_number = 530 # The first page is page #0, this is not a bug
+        page_number = 400 # The first page is page #0, this is not a bug
         page_exists = True
         courses = {}
         
@@ -37,19 +37,25 @@ class CourseScraper():
             return None
         for course in courseElements:
             course_heading = course.find('h4', class_='field-content').get_text(strip=True)
+            course_link = course.find('h4', class_='field-content').find('a')['href'] # Gets the heading, which has a hyperlink (a tag) to the course page
+            course_link = "https://www.mcgill.ca/" + course_link
             faculty = course.find('span', class_='views-field-field-faculty-code').get_text(strip=True)
             dept = course.find('span', class_='views-field-field-dept-code').get_text(strip=True)
             level = course.find('span', class_='views-field-level').get_text(strip=True)
             
+            description, prerequisites, corequisites = self.parseCoursePage(course_link)
             title = self.getTitle(course_heading)
             course_code = self.getCourseCode(course_heading)
             course_credits = self.getCredits(course_heading)
             
             course_info = {"faculty" : faculty,
                            "dept" : dept,
-                           "level": level,
-                           "course code": course_code,
-                           "credits" : course_credits
+                           "level" : level,
+                           "course code" : course_code,
+                           "credits" : course_credits,
+                           "description" : description,
+                           "prerequisites" : prerequisites,
+                           "corequisites" : corequisites
                            }
             courses.append((title, course_info)) # appends a tuple which can later be added to our json file w/ the title as the key and the info as the value
             
@@ -63,6 +69,14 @@ class CourseScraper():
         
         return courses # ex. [('Intro to Coding', {info:info, info2:info2}), ...]
     
+    def parseCoursePage(self, course_link):
+        soup = self.getSoup(course_link)
+        description = self.getDescription(soup)
+        prerequisites = self.getPrerequisites(soup) 
+        corequisites = self.getCorequisites(soup)
+
+        return description, prerequisites, corequisites
+
     def getTitle(self, course_heading):
         match = re.search(r'\d+\s(.*?)\s\(', course_heading)
         if match:
@@ -82,7 +96,68 @@ class CourseScraper():
         if match:
             return int(match.group(1))
         return None
+    
+    def getDescription(self, soup):
+        overview_header = soup.find('h3', text='Overview') # Find where it says overview
+
+        description_element = overview_header.find_next_sibling('p') # find the closest paragraph tag, this is always the description
+        description = description_element.get_text(strip=True)
+        return description
         
+    def getPrerequisites(self, soup):
+        '''
+        Use a sublist for when given 'or' in prereqs (would use a tuple, but json does not support tuples)
+        Ex. Prerequisites: MATH 235 and either (MATH 247 or MATH 251).
+        -> ['Math 235', ['MATH 247', 'MATH 251']]
+        Ex. Prerequisites: MATH 247 or MATH 251 or equivalent, and MATH 248 or MATH 358 or equivalent, MATH 325.
+        -> [['MATH 247', 'MATH 251'], ['MATH 248', 'MATH 358'], 'MATH 325']
+        Ex. Prerequisites: MATH 222, MATH 247 or MATH 251, MATH 255 or permission of the Department.
+        -> ['MATH 222', ['MATH 247', 'MATH 251'], ['MATH 255', 'permision of the Department']]
+        '''
+        notes_section = soup.find('ul', 'catalog-notes')
+        if notes_section:
+            paragraph_elements = notes_section.findAll('p')
+
+            for paragraph_element in paragraph_elements:
+                text = paragraph_element.get_text()
+                if 'Prerequisite' in text:
+                    text = text.strip("Prerequisite: ")
+                    text = text.strip("(s): ")
+                    prereqs = []
+                    
+                    prereqs_chunked = text.split(', ') # chunked by commas
+                    prereqs_chunked = [prereq.strip() for prereq in prereqs_chunked]
+                    
+                    for chunk in prereqs_chunked:
+                        and_chunks = chunk.split('and') # Cant think of a better variable name for this
+                        for and_chunk in and_chunks:
+                            if 'or' in and_chunk:
+                                prereqs.append(tuple(and_chunk.split(' or ')))
+                                    
+                            # elif 'and' in chunk: 
+                            #     prereqs.extend(chunk) # Split these up, so we extend the list
+                            else:
+                                prereqs.append(and_chunk)
+                    
+                    # prereqs = re.split(r'\s+or\s+|\s+and\s+|,\s*|\.\s*', text) # Split by "or", "and", ","
+                    # prereqs = [req.strip() for req in prereqs if req.strip()] # remove whitespace & empty items
+                    return prereqs
+        return []
+        
+    def getCorequisites(self, soup):
+        notes_section = soup.find('ul', 'catalog-notes')
+        if notes_section:
+            paragraph_elements = notes_section.findAll('p')
+            for paragraph_element in paragraph_elements:
+                text = paragraph_element.get_text()
+                if 'Corequisite' in text:
+                    text = text.strip("Corequisite: ")
+                    text = text.strip("(s): ")
+                    coreq = re.split(r'\s+or\s+|\s+and\s+|,\s*|\.\s*', text) # Split by "or", "and", ","
+                    coreq = [req.strip() for req in coreq if req.strip()] # remove whitespace & empty items
+                    return coreq
+        return []
+    
 if __name__ == '__main__':
     scraper = CourseScraper()
     scraper.main()
