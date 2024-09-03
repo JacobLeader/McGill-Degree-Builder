@@ -75,22 +75,36 @@ class DegreeScraper():
         # Trim leading and trailing whitespace
         return course.strip()
         
+    def getTitle(self, soup):
+        title_element = soup.find('h1', id='page-title')
+        title = title_element.get_text(strip=True)
+        return title
+    
+    def getCredits(self, title):
+        match = re.search(r'\((\d+)\s*credits\)', title, re.IGNORECASE)
+        if match:
+            return int(match.group(1))  # Convert the matched group to an integer
+        return None  # Return None if no match is found
+        
 if __name__ == '__main__':
     scraper = DegreeScraper()
     url = 'https://www.mcgill.ca/study/2024-2025/faculties/arts/undergraduate/programs/bachelor-arts-ba-major-concentration-computer-science#ba_csi8_major_ar'
     soup = scraper.getSoup(url)
+    title = scraper.getTitle(soup)
+    credits = scraper.getCredits(title)
+    cleaned_title = title[0:title.index('(')-1]
     required_courses, complementary_courses = scraper.separateCourseTypes(soup)
     
-    degree = {
+    data = {}
+    major = {
+        "Credits" : credits,
         "Required Courses" : required_courses,
         "Complementary Courses" : complementary_courses
     }
+    data[cleaned_title] = major
         
-    with open('data/CS_Major.json', 'w') as f:
-        json.dump(degree, f, indent=4)
-        
-        
-        
+    with open('data/arts_majors.json', 'w') as f:
+        json.dump(data, f, indent=4)
         
         
         
