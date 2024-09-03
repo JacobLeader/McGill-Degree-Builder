@@ -5,7 +5,7 @@ from utils.courseInfoHandler import getCourseCode, getCourseInfo
 from utils.courseLoader import loadCourseData
 from core.prerequisiteHandler import PrerequisiteCheck
 
-class ElectiveRecomender():
+class ElectiveRecommender():
     def __init__(self, courses, liked_courses, disliked_courses, completed_courses, preferred_departments):
         # All the lists of courses are dicts -> {title: {info:info, info2: info2, ...}, title: {...}}
         self.courses = courses
@@ -40,7 +40,6 @@ class ElectiveRecomender():
                         continue
                     
                 if valid_course and course_info['dept'] in self.preferred_departments and abs(year - course_level) <= 1 and prerequisite_checker.hasPrerequisites(course):
-                    # print(course_info['dept'])
                     return course_title
             except:
                 pass

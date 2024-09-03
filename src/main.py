@@ -1,11 +1,12 @@
 
 from utils.courseLoader import loadCourseData
-from core.electiveAlgorithm import ElectiveRecomender
+from core.electiveAlgorithm import ElectiveRecommender
 import pprint
 
 class Main():
     def __init__(self):
         self.courses = loadCourseData()
+        self.courses_scheduled = []
         
     def getElectives(self):
         liked_courses = [
@@ -28,7 +29,7 @@ class Main():
             "Philosophy"
         ]
         
-        elective_recommender = ElectiveRecomender(self.courses, liked_courses, disliked_courses, completed_courses, preferred_departments)
+        elective_recommender = ElectiveRecommender(self.courses, liked_courses, disliked_courses, completed_courses, preferred_departments)
         print(elective_recommender.recommend_course(1))
         
         
