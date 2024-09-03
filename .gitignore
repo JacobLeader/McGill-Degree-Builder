@@ -1,3 +1,4 @@
 /env
 TestGround.py
 *.pyc
+.DS_Store
