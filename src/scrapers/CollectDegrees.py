@@ -3,6 +3,7 @@ import requests
 import re
 from bs4 import BeautifulSoup
 from collections import defaultdict
+import json
 
 class DegreeScraper():
     # def __init__(self):
@@ -30,7 +31,7 @@ class DegreeScraper():
                     for course_item in courses:
                         course_title = course_item.find('a', class_='program-course-title') # The course title is a hyperlink (a)
                         if course_title:
-                            required_courses.append(course_title.get_text(strip=True))
+                            required_courses.append(self.clean_string(course_title.get_text(strip=True)))
             
             elif 'Complementary Courses' in heading_text:
                 current_element = heading.next_sibling
@@ -53,12 +54,26 @@ class DegreeScraper():
                         for course_item in courses:
                             course_title = course_item.find('a', class_='program-course-title') # the course title is the hyperlink (a) part of the list item element
                             if course_title:
-                                complementary_courses[group_letter].append(course_title.get_text(strip=True))
+                                complementary_courses[group_letter].append(self.clean_string(course_title.get_text(strip=True)))
                     
                     current_element = current_element.next_sibling
 
         return required_courses, dict(complementary_courses)
+    
+    def clean_string(self, course):
+        # Define the unwanted patterns
+        unwanted_patterns = [
+            r'\*',      # Asterisks
+            r'\r',      # Carriage returns
+            r'\s{2,}'   # Multiple spaces
+        ]
         
+        # Remove unwanted patterns
+        for pattern in unwanted_patterns:
+            course = re.sub(pattern, '', course)
+        
+        # Trim leading and trailing whitespace
+        return course.strip()
         
 if __name__ == '__main__':
     scraper = DegreeScraper()
@@ -66,9 +81,13 @@ if __name__ == '__main__':
     soup = scraper.getSoup(url)
     required_courses, complementary_courses = scraper.separateCourseTypes(soup)
     
-    print(required_courses, '\n\n\n')
-    print(complementary_courses)
+    degree = {
+        "Required Courses" : required_courses,
+        "Complementary Courses" : complementary_courses
+    }
         
+    with open('data/CS_Major.json', 'w') as f:
+        json.dump(degree, f, indent=4)
         
         
         
