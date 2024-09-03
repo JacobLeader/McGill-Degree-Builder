@@ -29,9 +29,10 @@ class DegreeScraper():
                 if course_set:
                     courses = course_set.find_all('li', class_='program-course') # Each course has a list item tag (li)
                     for course_item in courses:
-                        course_title = course_item.find('a', class_='program-course-title') # The course title is a hyperlink (a)
-                        if course_title:
-                            required_courses.append(self.clean_string(course_title.get_text(strip=True)))
+                        course_title_element = course_item.find('a', class_='program-course-title') # The course title is a hyperlink (a)
+                        if course_title_element:
+                            course_title = self.clean_string(course_title_element.get_text(strip=True))
+                            required_courses.append(course_title)
             
             elif 'Complementary Courses' in heading_text:
                 current_element = heading.next_sibling
@@ -52,9 +53,11 @@ class DegreeScraper():
                         
                         courses = current_element.find_all('li', class_='program-course') # Gets the list items from the set, these are the course elements
                         for course_item in courses:
-                            course_title = course_item.find('a', class_='program-course-title') # the course title is the hyperlink (a) part of the list item element
-                            if course_title:
-                                complementary_courses[group_letter].append(self.clean_string(course_title.get_text(strip=True)))
+                            course_title_element = course_item.find('a', class_='program-course-title') # the course title is the hyperlink (a) part of the list item element
+                            
+                            if course_title_element:
+                                course_title = self.clean_string(course_title_element.get_text(strip=True))
+                                complementary_courses[group_letter].append(course_title)
                     
                     current_element = current_element.next_sibling
 
