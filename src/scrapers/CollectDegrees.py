@@ -89,6 +89,19 @@ class DegreeScraper():
             return int(match.group(1))  # Convert the matched group to an integer
         return None  # Return None if no match is found
         
+    def getCreditBreakdown(self, soup):
+        h4_elements = soup.findAll('h4')
+        required_course_credits, complementary_course_credits = 0, 0
+        for element in h4_elements:
+            text = element.get_text(strip=True)
+            if "Required" in text:
+                required_course_credits = self.getCredits(text)
+            if "Complementary" in text:
+                complementary_course_credits = self.getCredits(text)
+        
+        return required_course_credits, complementary_course_credits
+        
+
 if __name__ == '__main__':
     scraper = DegreeScraper()
     url = 'https://www.mcgill.ca/study/2024-2025/faculties/arts/undergraduate/programs/bachelor-arts-ba-major-concentration-computer-science#ba_csi8_major_ar'
@@ -97,12 +110,21 @@ if __name__ == '__main__':
     credits = scraper.getCredits(title)
     cleaned_title = title[0:title.index('(')-1]
     required_courses, complementary_courses = scraper.separateCourseTypes(soup)
+    required_course_credits, complementary_course_credits = scraper.getCreditBreakdown(soup)
     
     data = {}
+    required_courses_dict = {
+        "Credits" : required_course_credits,
+        "Courses" : required_courses
+    }
+    complementary_courses_dict = {
+        "Credits" : complementary_course_credits,
+        "Courses" : complementary_courses
+    }
     major = {
         "Credits" : credits,
-        "Required Courses" : required_courses,
-        "Complementary Courses" : complementary_courses
+        "Required Courses" : required_courses_dict,
+        "Complementary Courses" : complementary_courses_dict
     }
     data[cleaned_title] = major
         
