@@ -3,6 +3,7 @@ import sys
 sys.path.append("..") # append the path of the parent directory to allow access to sibling directories
 from utils.courseInfoHandler import getCourseCode, getCourseInfo
 from utils.courseLoader import loadCourseData
+from core.prerequisiteHandler import PrerequisiteCheck
 
 class ElectiveRecomender():
     def __init__(self, courses, liked_courses, disliked_courses, completed_courses, preferred_departments):
@@ -14,13 +15,14 @@ class ElectiveRecomender():
         self.preferred_departments = preferred_departments
         
     def recommend_course(self, year):
+        prerequisite_checker = PrerequisiteCheck(self.completed_courses, [])
         # Algo can be changed!
         
         # If there is a user says they want to do an elective, they haven't done it yet, and the level is within a year, it seems straight forward to suggest it
         for course in self.liked_courses:
             course_info = getCourseInfo(course)
             course_level = int(getCourseCode(course_info['course code'])[0]) #  1,2,3,4,5 or 6
-            if course not in self.completed_courses and abs(year - course_level) <= 1:
+            if course not in self.completed_courses and abs(year - course_level) <= 1 and prerequisite_checker.hasPrerequisites(course):
                 return course
             
         courses_data = loadCourseData()
@@ -37,7 +39,7 @@ class ElectiveRecomender():
                         valid_course = False
                         continue
                     
-                if valid_course and course_info['dept'] in self.preferred_departments and abs(year - course_level) <= 1:
+                if valid_course and course_info['dept'] in self.preferred_departments and abs(year - course_level) <= 1 and prerequisite_checker.hasPrerequisites(course):
                     # print(course_info['dept'])
                     return course_title
             except:
