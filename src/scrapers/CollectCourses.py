@@ -5,7 +5,7 @@ import json
 
 class CourseScraper():
     def main(self):
-        page_number = 400 # The first page is page #0, this is not a bug
+        page_number = 0 # The first page is page #0, this is not a bug
         page_exists = True
         courses = {}
         
@@ -23,7 +23,7 @@ class CourseScraper():
                 page_exists = False # Looks like there are 532 pages
 
         with open('data/courses.json', 'w') as f:
-            json.dump(courses, f, indent=4) 
+            json.dump(courses, f, indent=4)
             
     def getSoup(self, url):
         page_content = requests.get(url)
